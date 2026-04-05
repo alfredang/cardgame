@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#0D1117">
   <title>Queue Number: The Great Allocation</title>
@@ -289,6 +289,22 @@
       </div>
       <button class="btn btn-primary btn-full mt-2" id="btn-confirm-milestone" disabled>
         Confirm Choice
+      </button>
+    </div>
+  </dialog>
+
+  <!-- ============================================================
+       DIALOG: Player Name
+       ============================================================ -->
+  <dialog id="name-modal">
+    <div class="modal-content">
+      <h3 class="modal-card-title">Enter Your Name</h3>
+      <p class="text-secondary mb-2" style="font-size:0.9rem">Choose a display name for the game.</p>
+      <div class="input-group">
+        <input type="text" class="input" id="input-player-name" placeholder="Your name" maxlength="20" autocomplete="off">
+      </div>
+      <button class="btn btn-primary btn-full mt-2" id="btn-confirm-name" disabled>
+        Continue
       </button>
     </div>
   </dialog>

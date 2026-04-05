@@ -581,13 +581,44 @@ const App = {
 
   promptPlayerName() {
     return new Promise((resolve) => {
-      // Simple prompt — in a production app, this would be a nice modal
-      const name = prompt('Enter your display name:');
-      if (name && name.trim()) {
-        resolve(name.trim().substring(0, 20));
-      } else {
-        resolve(null);
+      const modal = document.getElementById('name-modal');
+      const input = document.getElementById('input-player-name');
+      const btn = document.getElementById('btn-confirm-name');
+      if (!modal || !input || !btn) {
+        // Fallback to prompt if modal elements missing
+        const name = prompt('Enter your display name:');
+        resolve(name && name.trim() ? name.trim().substring(0, 20) : null);
+        return;
       }
+
+      input.value = '';
+      btn.disabled = true;
+
+      // Enable button when input has text
+      const onInput = () => { btn.disabled = !input.value.trim(); };
+      input.addEventListener('input', onInput);
+
+      // Allow enter key
+      const onKeyup = (e) => { if (e.key === 'Enter' && input.value.trim()) btn.click(); };
+      input.addEventListener('keyup', onKeyup);
+
+      const cleanup = () => {
+        input.removeEventListener('input', onInput);
+        input.removeEventListener('keyup', onKeyup);
+        modal.close();
+      };
+
+      btn.onclick = () => {
+        const name = input.value.trim().substring(0, 20);
+        cleanup();
+        resolve(name || null);
+      };
+
+      // Handle cancel (backdrop click or Esc)
+      modal.addEventListener('cancel', () => { cleanup(); resolve(null); }, { once: true });
+
+      modal.showModal();
+      setTimeout(() => input.focus(), 100);
     });
   },
 
