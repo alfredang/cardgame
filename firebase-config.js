@@ -1,19 +1,21 @@
 // ============================================================
 // Firebase Configuration
 // ============================================================
-// Replace the placeholder values below with your Firebase project config.
-// You can find these values in the Firebase Console:
-//   Project Settings → General → Your apps → Firebase SDK snippet
+// These placeholder tokens are replaced at deploy time by GitHub Actions
+// using repository secrets. See .github/workflows/deploy-pages.yml
+//
+// For local development, create a firebase-config.local.js or
+// replace the __FIREBASE_*__ tokens with your actual values.
 // ============================================================
 
 const firebaseConfig = {
-  apiKey:            "YOUR_API_KEY",            // e.g. "AIzaSyD..."
-  authDomain:        "YOUR_PROJECT.firebaseapp.com",
-  databaseURL:       "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
-  projectId:         "YOUR_PROJECT_ID",
-  storageBucket:     "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId:             "YOUR_APP_ID"
+  apiKey:            "__FIREBASE_API_KEY__",
+  authDomain:        "__FIREBASE_AUTH_DOMAIN__",
+  databaseURL:       "__FIREBASE_DATABASE_URL__",
+  projectId:         "__FIREBASE_PROJECT_ID__",
+  storageBucket:     "__FIREBASE_STORAGE_BUCKET__",
+  messagingSenderId: "__FIREBASE_MESSAGING_SENDER_ID__",
+  appId:             "__FIREBASE_APP_ID__"
 };
 
 // Initialize Firebase
