@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0D1117">
+  <title>How to Play — Queue Number</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Theme Toggle -->
+  <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+    <span id="theme-icon">&#9790;</span>
+  </button>
+
+  <div class="instructions-page">
+    <a href="index.html" class="instructions-back">&larr; Back to Game</a>
+
+    <h1>How to Play</h1>
+    <p class="text-secondary mb-2">Queue Number: The Great Allocation</p>
+
+    <!-- Quick Nav -->
+    <nav class="instructions-nav">
+      <a href="#overview">Overview</a>
+      <a href="#objective">Objective</a>
+      <a href="#components">Components</a>
+      <a href="#setup">Setup</a>
+      <a href="#rounds">Rounds</a>
+      <a href="#resolution">Resolution</a>
+      <a href="#milestones">Milestones</a>
+      <a href="#scoring">Scoring</a>
+      <a href="#winning">Winning</a>
+      <a href="#variants">Variants</a>
+      <a href="#example">Example</a>
+      <a href="#tips">Tips</a>
+    </nav>
+
+    <!-- 1. Overview -->
+    <section class="instructions-section" id="overview">
+      <h2>1. Game Overview</h2>
+      <p>Queue Number: The Great Allocation is a strategy card game about navigating scarcity, queue systems, and time management in a fictional scheduling city.</p>
+      <p>Players compete to secure limited opportunities by playing queue cards, bidding time, and entering ballots. Each round brings new opportunities and disruptions that change the rules. The player who best balances resource spending, milestone collection, and diversification wins.</p>
+      <p>Think of it as a game about real-life queueing — housing ballots, appointment slots, auction bidding, and the tradeoffs you make when everything is scarce and time is limited.</p>
+    </section>
+
+    <!-- 2. Objective -->
+    <section class="instructions-section" id="objective">
+      <h2>2. Objective</h2>
+      <p>Score the most points by the end of the game through a combination of:</p>
+      <ul>
+        <li>Winning opportunities that give direct score points</li>
+        <li>Collecting milestones and meeting their scoring conditions</li>
+        <li>Building set bonuses (multiple wins in the same category)</li>
+        <li>Achieving diversity bonuses (wins across many categories)</li>
+        <li>Maintaining life balance (diverse wins plus remaining time)</li>
+      </ul>
+    </section>
+
+    <!-- 3. Components -->
+    <section class="instructions-section" id="components">
+      <h2>3. Components</h2>
+
+      <details>
+        <summary><span class="card-type-example opp">Opportunity Cards (40)</span></summary>
+        <div>
+          <p>These represent limited resources and services available each round. Each opportunity has:</p>
+          <ul>
+            <li><strong>Name</strong> — what the opportunity is</li>
+            <li><strong>Category</strong> — housing, education, healthcare, transport, leisure, finance, food, or tech</li>
+            <li><strong>Resolution Type</strong> — how the winner is decided (Priority, Auction, or Ballot)</li>
+            <li><strong>Slots</strong> — how many players can win (usually 1-2)</li>
+            <li><strong>Reward</strong> — points, time tokens, or milestone progress</li>
+            <li><strong>Consolation</strong> — small bonus for losers (on some cards)</li>
+          </ul>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="card-type-example queue">Queue Cards (35)</span></summary>
+        <div>
+          <p>Your hand of cards. Each has a <strong>queue number</strong> from 1 to 7. These are your tools for competing:</p>
+          <ul>
+            <li><strong>Low numbers (1-3)</strong> — Great for priority-based opportunities (lowest number wins first)</li>
+            <li><strong>Mid numbers (4-5)</strong> — Balanced for most situations</li>
+            <li><strong>High numbers (6-7)</strong> — Better for ballot draws (higher number = more tickets)</li>
+          </ul>
+          <p>You play one queue card each round when committing to an opportunity.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="card-type-example mile">Milestone Cards (25)</span></summary>
+        <div>
+          <p>Personal goals that score bonus points at the end of the game if you meet their conditions. Examples:</p>
+          <ul>
+            <li><strong>Homeowner</strong> — Collect 2+ housing opportunities (4 pts)</li>
+            <li><strong>Diversifier</strong> — Collect from 4+ categories (5 pts)</li>
+            <li><strong>Time Lord</strong> — End with 8+ Time tokens (5 pts)</li>
+            <li><strong>Queue Master</strong> — Win 3+ priority opportunities (5 pts)</li>
+          </ul>
+          <p>At game start, you'll be dealt 2 milestones and choose 1 to keep. This shapes your strategy.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary><span class="card-type-example dis">Disruption Cards (20)</span></summary>
+        <div>
+          <p>One disruption card is revealed each round, modifying the rules. Effects include:</p>
+          <ul>
+            <li><strong>System Outage</strong> — The lowest queue number gets no reward</li>
+            <li><strong>Time Tax</strong> — All players lose 1 Time</li>
+            <li><strong>Double Reward</strong> — All rewards are doubled</li>
+            <li><strong>Queue Shuffle</strong> — Highest queue number wins priority</li>
+            <li><strong>Lucky Day</strong> — Ballot slots increase by 1</li>
+            <li><strong>Clear Skies</strong> — No disruption (sometimes you get lucky!)</li>
+          </ul>
+          <p>Disruptions keep every round feeling different and require you to adapt your strategy.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>Time Tokens</summary>
+        <div>
+          <p>Your main currency. You start with <strong>10 Time</strong>. Time is spent bidding in auctions, and gained from winning certain opportunities. Managing your time is crucial — spend too much early and you'll have nothing left for later rounds.</p>
+        </div>
+      </details>
+    </section>
+
+    <!-- 4. Setup -->
+    <section class="instructions-section" id="setup">
+      <h2>4. Setup</h2>
+      <ol>
+        <li>One player creates a room and shares the room code or QR code</li>
+        <li>Other players join by entering the code or scanning the QR</li>
+        <li>Once 2-5 players have joined, the host starts the game</li>
+        <li>Each player starts with <strong>10 Time tokens</strong></li>
+        <li>Each player is dealt <strong>5 Queue cards</strong></li>
+        <li>Each player is dealt <strong>2 Milestone cards</strong> and chooses <strong>1 to keep</strong></li>
+        <li>The <strong>Opportunity Row</strong> is filled with 3 cards (4 for 4-5 players)</li>
+        <li>The game lasts <strong>8 rounds</strong> (7 for 4-5 players)</li>
+      </ol>
+    </section>
+
+    <!-- 5. Round Structure -->
+    <section class="instructions-section" id="rounds">
+      <h2>5. Round Structure</h2>
+      <p>Each round has four phases:</p>
+
+      <h3>Phase 1: Reveal</h3>
+      <p>New opportunity cards are placed in the Opportunity Row, and a disruption card is revealed. All players can see the available opportunities and the active disruption.</p>
+
+      <h3>Phase 2: Commit</h3>
+      <p>All players simultaneously and <strong>secretly</strong> choose:</p>
+      <ul>
+        <li>Which <strong>Queue card</strong> to play from their hand</li>
+        <li>Which <strong>Opportunity</strong> to target</li>
+        <li>How much <strong>Time to bid</strong> (for auction opportunities only)</li>
+      </ul>
+      <p>Your choices are hidden from other players until everyone has submitted. This is the core strategic decision each round.</p>
+
+      <h3>Phase 3: Resolve</h3>
+      <p>Opportunities resolve from left to right using their resolution type (see Resolution Types below). Winners collect rewards, losers may receive consolation.</p>
+
+      <h3>Phase 4: Refresh</h3>
+      <p>Played queue cards are discarded. Players draw back up to 5 cards. The round counter advances.</p>
+    </section>
+
+    <!-- 6. Resolution Types -->
+    <section class="instructions-section" id="resolution">
+      <h2>6. Resolution Types</h2>
+
+      <h3>Priority</h3>
+      <p>The player with the <strong>lowest queue number</strong> wins. If there's a tie, the player who submitted first wins. This rewards having low-numbered cards and committing quickly.</p>
+      <p><em>Strategy: Save your low-numbered cards (1s and 2s) for priority opportunities you really want.</em></p>
+
+      <h3>Auction</h3>
+      <p>The player who <strong>bids the most Time tokens</strong> wins. The winner pays their bid; losers pay nothing. Ties are broken by lowest queue number.</p>
+      <p><em>Strategy: Don't overbid. Other players may not even compete for the same opportunity. Budget your Time carefully across rounds.</em></p>
+
+      <h3>Ballot</h3>
+      <p>All committed players enter a <strong>weighted random draw</strong>. Your queue card's value determines how many "tickets" you get — a card with value 7 gives you 7 tickets, while a 1 gives only 1. Higher numbers are better for ballots!</p>
+      <p><em>Strategy: Use your high-numbered cards (6s and 7s) for ballot opportunities where they give you more chances.</em></p>
+    </section>
+
+    <!-- 7. Milestones -->
+    <section class="instructions-section" id="milestones">
+      <h2>7. How Milestones Score</h2>
+      <p>At the start of the game, you chose one milestone to keep. At the end, if you've met the milestone's condition, you earn its points.</p>
+      <p>There are two types of milestones:</p>
+      <ul>
+        <li><strong>Category milestones</strong> — Require collecting 2+ (or 3+) opportunities from a specific category. Example: "Homeowner" requires 2+ housing wins for 4 points.</li>
+        <li><strong>Special milestones</strong> — Require meeting unique conditions. Example: "Time Lord" requires ending with 8+ Time for 5 points.</li>
+      </ul>
+      <p>Your milestone should guide your strategy — if you picked "Foodie," prioritize food opportunities throughout the game.</p>
+    </section>
+
+    <!-- 8. End Game Scoring -->
+    <section class="instructions-section" id="scoring">
+      <h2>8. End Game Scoring</h2>
+      <p>After the final round, points are tallied from multiple sources:</p>
+
+      <table class="score-table" style="margin-top:0.75rem">
+        <thead>
+          <tr><th>Source</th><th>Points</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Direct opportunity score rewards</td><td>Varies per card</td></tr>
+          <tr><td>Milestone bonus (if condition met)</td><td>3-7 pts</td></tr>
+          <tr><td>Set bonus — pair of same category</td><td>+2 pts</td></tr>
+          <tr><td>Set bonus — triple of same category</td><td>+5 pts</td></tr>
+          <tr><td>Diversity — 3 unique categories</td><td>+3 pts</td></tr>
+          <tr><td>Diversity — 4 unique categories</td><td>+6 pts</td></tr>
+          <tr><td>Diversity — 5+ unique categories</td><td>+10 pts</td></tr>
+          <tr><td>Life Balance (3+ categories AND 5+ Time)</td><td>+5 pts</td></tr>
+        </tbody>
+      </table>
+
+      <p class="mt-2"><strong>Tiebreaker:</strong> If players tie on total score, the player with the most remaining Time tokens wins.</p>
+    </section>
+
+    <!-- 9. How to Win -->
+    <section class="instructions-section" id="winning">
+      <h2>9. How to Win</h2>
+      <p>The player with the <strong>highest total score</strong> wins. There's no single winning strategy — you can win by:</p>
+      <ul>
+        <li><strong>Specializing</strong> — Focus on one category for big set bonuses and milestone points</li>
+        <li><strong>Diversifying</strong> — Spread across many categories for diversity bonuses</li>
+        <li><strong>Time hoarding</strong> — Save Time for auctions and the Life Balance bonus</li>
+        <li><strong>Opportunistic play</strong> — Read the board and target uncontested opportunities</li>
+      </ul>
+      <p>The best players adapt based on their milestone, the available opportunities, and what other players seem to be targeting.</p>
+    </section>
+
+    <!-- 10. Player Count Variants -->
+    <section class="instructions-section" id="variants">
+      <h2>10. Player Count Variants</h2>
+
+      <table class="score-table" style="margin-top:0.75rem">
+        <thead>
+          <tr><th>Players</th><th>Opp. Row</th><th>Rounds</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>2</td><td>3</td><td>8</td><td>More head-to-head. Easier to predict opponent.</td></tr>
+          <tr><td>3</td><td>3</td><td>8</td><td>Sweet spot. Good balance of competition and options.</td></tr>
+          <tr><td>4</td><td>4</td><td>7</td><td>More competition per opportunity. Extra card in row.</td></tr>
+          <tr><td>5</td><td>4</td><td>7</td><td>Most chaotic. Harder to predict. Ballots are wild.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 11. Example Turn -->
+    <section class="instructions-section" id="example">
+      <h2>11. Example Turn</h2>
+      <p><strong>Situation:</strong> It's round 3. You have 8 Time, and your hand is: 2, 3, 4, 6, 7.</p>
+      <p>The opportunity row shows:</p>
+      <ol>
+        <li><strong>Public Housing Unit</strong> (Priority, 1 slot, Milestone reward)</li>
+        <li><strong>Premium Apartment</strong> (Auction, 1 slot, 2 score + Milestone)</li>
+        <li><strong>BTO Flat Ballot</strong> (Ballot, 1 slot, 1 score + Milestone)</li>
+      </ol>
+      <p>The disruption is <strong>Clear Skies</strong> — no effect this round.</p>
+
+      <p><strong>Your milestone:</strong> Homeowner (collect 2+ housing opportunities).</p>
+
+      <p><strong>Analysis:</strong></p>
+      <ul>
+        <li>All three are housing! Great for your milestone.</li>
+        <li>Priority: Your lowest card is a 2 — decent but another player might have a 1.</li>
+        <li>Auction: You'd need to bid Time, reducing your flexibility later.</li>
+        <li>Ballot: Your 7 card gives great odds (7 tickets), and other players might focus on the priority/auction.</li>
+      </ul>
+
+      <p><strong>Decision:</strong> You play your <strong>7 card</strong> on the <strong>BTO Flat Ballot</strong>. It's the safest path to a housing milestone with good odds and no Time spent.</p>
+    </section>
+
+    <!-- 12. Tips -->
+    <section class="instructions-section" id="tips">
+      <h2>12. Tips for Beginners</h2>
+      <ul>
+        <li><strong>Don't ignore your milestone.</strong> It's free points if you plan around it.</li>
+        <li><strong>Match your cards to resolution types.</strong> Low cards for priority, high cards for ballot, Time for auction.</li>
+        <li><strong>Don't overbid in auctions.</strong> You might be the only bidder. Start low.</li>
+        <li><strong>Watch the disruption card.</strong> It can completely change the optimal play.</li>
+        <li><strong>Keep some Time.</strong> The Life Balance bonus is worth 5 points, and you need Time for auctions.</li>
+        <li><strong>Diversify early, specialize late.</strong> In the first few rounds, grab different categories. In later rounds, focus on filling sets.</li>
+        <li><strong>Read your opponents.</strong> If everyone wants the same opportunity, target something else for a free win.</li>
+        <li><strong>Consolation isn't nothing.</strong> Sometimes competing and losing still gets you a Time token.</li>
+        <li><strong>Ballot is unpredictable.</strong> Don't rely on it, but don't ignore it either — high cards have great odds.</li>
+        <li><strong>Have fun!</strong> It's a game about queueing. Don't take it too seriously.</li>
+      </ul>
+    </section>
+
+  </div>
+
+  <!-- Scroll to top -->
+  <button class="scroll-top-btn" id="scroll-top" aria-label="Scroll to top">&uarr;</button>
+
+  <script>
+    // Theme toggle
+    (function() {
+      const saved = localStorage.getItem('qn-theme');
+      if (saved) document.documentElement.setAttribute('data-theme', saved);
+
+      const icon = document.getElementById('theme-icon');
+      const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+      if (icon) icon.innerHTML = isDark ? '&#9790;' : '&#9728;';
+
+      document.getElementById('theme-toggle').addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme');
+        const next = current === 'light' ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('qn-theme', next);
+        icon.innerHTML = next === 'light' ? '&#9728;' : '&#9790;';
+      });
+
+      // Scroll to top button
+      const scrollBtn = document.getElementById('scroll-top');
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 400) {
+          scrollBtn.classList.add('visible');
+        } else {
+          scrollBtn.classList.remove('visible');
+        }
+      });
+      scrollBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    })();
+  </script>
+
+</body>
+</html>

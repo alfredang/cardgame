@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0D1117">
+  <title>Queue Number: The Great Allocation</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Theme Toggle (global) -->
+  <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+    <span id="theme-icon">&#9790;</span>
+  </button>
+
+  <!-- ============================================================
+       SCREEN: Landing
+       ============================================================ -->
+  <section id="screen-landing" class="screen active">
+    <div class="landing-logo">
+      <div class="landing-logo-icon">&#9878;</div>
+      <h1 class="landing-title">Queue Number</h1>
+      <p class="landing-tagline">The Great Allocation — a strategy card game of scarcity, queues, and tradeoffs</p>
+    </div>
+
+    <div class="landing-actions">
+      <button class="btn btn-primary btn-lg btn-full" id="btn-create-room">
+        Create Room
+      </button>
+
+      <div class="landing-join-form">
+        <input
+          type="text"
+          class="input input-code"
+          id="input-join-code"
+          placeholder="ROOM CODE"
+          maxlength="4"
+          autocomplete="off"
+          autocapitalize="characters"
+        >
+        <button class="btn btn-secondary btn-lg btn-full" id="btn-join-room">
+          Join Room
+        </button>
+      </div>
+    </div>
+
+    <div class="landing-footer">
+      <a href="instructions.html">How to Play</a>
+      <span class="text-muted">|</span>
+      <a href="#" id="btn-local-test">Local Test</a>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SCREEN: Lobby
+       ============================================================ -->
+  <section id="screen-lobby" class="screen">
+    <div class="lobby-header">
+      <h2>Game Lobby</h2>
+      <p class="text-secondary">Share the code or scan QR to join</p>
+      <div class="lobby-room-code">
+        <span class="room-code-display" id="lobby-room-code">----</span>
+        <button class="btn btn-ghost btn-sm" id="btn-copy-code" title="Copy code">&#128203;</button>
+      </div>
+    </div>
+
+    <div class="lobby-qr">
+      <div id="qr-container"></div>
+      <p>Scan to join on your phone</p>
+      <div class="lobby-share-actions">
+        <button class="btn btn-secondary btn-sm" id="btn-copy-link">Copy Link</button>
+        <button class="btn btn-secondary btn-sm" id="btn-share" style="display:none">Share</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Players</span>
+        <span class="badge badge-accent" id="lobby-player-count">0 / 5</span>
+      </div>
+      <div class="lobby-players" id="lobby-player-list">
+        <!-- Player cards rendered dynamically -->
+      </div>
+    </div>
+
+    <div class="lobby-start">
+      <button class="btn btn-primary btn-lg btn-full" id="btn-start-game" disabled>
+        Start Game
+      </button>
+      <p class="text-muted text-center mt-1" id="lobby-status-text">Waiting for players...</p>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SCREEN: Game
+       ============================================================ -->
+  <section id="screen-game" class="screen">
+    <!-- Game Header -->
+    <header class="game-header">
+      <div class="game-header-left">
+        <span class="game-round-badge" id="game-round">Round 1/8</span>
+        <span class="game-phase-badge phase-reveal" id="game-phase">REVEAL</span>
+      </div>
+      <div class="game-header-right">
+        <span class="game-time-display">
+          <span>&#9202;</span>
+          <span id="game-time-tokens">10</span>
+        </span>
+        <span class="game-room-code" id="game-room-code"></span>
+      </div>
+    </header>
+
+    <!-- Main Content (tabbed) -->
+    <main class="game-main">
+
+      <!-- Board Tab -->
+      <div id="tab-board" class="tab-content active">
+        <div class="disruption-banner hidden" id="disruption-banner">
+          <span class="icon">&#9888;</span>
+          <div>
+            <span class="label" id="disruption-name">Disruption</span>
+            <div class="text" id="disruption-text">Effect description</div>
+          </div>
+        </div>
+
+        <h3 class="mb-1">Opportunities</h3>
+        <div class="opportunity-row" id="opportunity-row">
+          <!-- Opportunity cards rendered dynamically -->
+        </div>
+      </div>
+
+      <!-- Hand Tab -->
+      <div id="tab-hand" class="tab-content">
+        <div class="hand-section">
+          <div class="hand-info">
+            <h3>Your Hand</h3>
+            <span class="hand-count" id="hand-count">0 cards</span>
+          </div>
+          <div class="card-carousel" id="card-carousel">
+            <!-- Queue cards rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- Commit Review (visible during commit phase) -->
+        <div class="commit-review hidden" id="commit-review">
+          <h4>Your Commitment</h4>
+          <div id="commit-summary">
+            <!-- Filled dynamically -->
+          </div>
+        </div>
+
+        <div class="milestones-section">
+          <h4>Your Milestones</h4>
+          <div class="milestone-list" id="player-milestones">
+            <!-- Milestones rendered dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Score Tab -->
+      <div id="tab-score" class="tab-content">
+        <h3 class="mb-2">Scoreboard</h3>
+        <table class="score-table" id="score-table">
+          <thead>
+            <tr>
+              <th>Player</th>
+              <th>Milestones</th>
+              <th>Time</th>
+              <th>Score</th>
+            </tr>
+          </thead>
+          <tbody id="score-tbody">
+            <!-- Rows rendered dynamically -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Log Tab -->
+      <div id="tab-log" class="tab-content">
+        <h3 class="mb-2">Game Log</h3>
+        <div class="game-log" id="game-log">
+          <!-- Log entries rendered dynamically -->
+        </div>
+      </div>
+
+      <!-- Waiting Overlay -->
+      <div class="waiting-overlay hidden" id="waiting-overlay">
+        <div class="waiting-spinner"></div>
+        <p class="waiting-text">Waiting for other players...</p>
+        <p class="waiting-count" id="waiting-count">0 / 0 submitted</p>
+      </div>
+    </main>
+
+    <!-- Action Bar -->
+    <div class="action-bar" id="action-bar">
+      <button class="btn btn-primary btn-full" id="btn-action" disabled>
+        Select a card to play
+      </button>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+      <button class="nav-tab active" data-tab="tab-board">
+        <span class="nav-icon">&#9881;</span>
+        Board
+      </button>
+      <button class="nav-tab" data-tab="tab-hand">
+        <span class="nav-icon">&#9995;</span>
+        Hand
+      </button>
+      <button class="nav-tab" data-tab="tab-score">
+        <span class="nav-icon">&#9734;</span>
+        Score
+      </button>
+      <button class="nav-tab" data-tab="tab-log">
+        <span class="nav-icon">&#128221;</span>
+        Log
+      </button>
+    </nav>
+  </section>
+
+  <!-- ============================================================
+       SCREEN: Game Over
+       ============================================================ -->
+  <section id="screen-gameover" class="screen">
+    <div class="gameover-crown">&#128081;</div>
+    <h2 class="gameover-winner" id="gameover-winner">Winner Name</h2>
+    <div class="gameover-score" id="gameover-score">0</div>
+    <p class="text-secondary">points</p>
+
+    <div class="gameover-breakdown" id="gameover-breakdown">
+      <!-- Breakdown items rendered dynamically -->
+    </div>
+
+    <div class="gameover-rankings" id="gameover-rankings">
+      <!-- Ranking items rendered dynamically -->
+    </div>
+
+    <div class="gameover-actions">
+      <button class="btn btn-primary" id="btn-rematch">Rematch</button>
+      <button class="btn btn-secondary" id="btn-home">Home</button>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       DIALOG: Card Detail
+       ============================================================ -->
+  <dialog id="card-modal">
+    <div class="modal-content">
+      <button class="modal-close" id="modal-close">&times;</button>
+      <div class="modal-card-type" id="modal-card-type">QUEUE CARD</div>
+      <h3 class="modal-card-title" id="modal-card-title">Card Name</h3>
+      <div class="modal-card-body" id="modal-card-body">Card description and effect text.</div>
+      <div class="modal-card-stats" id="modal-card-stats">
+        <!-- Stats rendered dynamically -->
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ============================================================
+       DIALOG: Round Results
+       ============================================================ -->
+  <dialog id="results-modal">
+    <div class="modal-content">
+      <button class="modal-close" id="results-modal-close">&times;</button>
+      <h3 class="modal-card-title">Round Results</h3>
+      <div class="results-content" id="results-content">
+        <!-- Results rendered dynamically -->
+      </div>
+      <button class="btn btn-primary btn-full mt-2" id="btn-continue-round">Continue</button>
+    </div>
+  </dialog>
+
+  <!-- ============================================================
+       DIALOG: Milestone Choice
+       ============================================================ -->
+  <dialog id="milestone-modal">
+    <div class="modal-content">
+      <h3 class="modal-card-title">Choose a Milestone</h3>
+      <p class="text-secondary mb-2" style="font-size:0.9rem">Pick one milestone to keep. This will guide your scoring strategy.</p>
+      <div class="milestone-choice" id="milestone-choice">
+        <!-- Milestone options rendered dynamically -->
+      </div>
+      <button class="btn btn-primary btn-full mt-2" id="btn-confirm-milestone" disabled>
+        Confirm Choice
+      </button>
+    </div>
+  </dialog>
+
+  <!-- ============================================================
+       Scripts (load order matters)
+       ============================================================ -->
+  <!-- Firebase SDK (compat for simplicity with vanilla JS) -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-database-compat.js"></script>
+
+  <!-- QR Code library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <!-- App scripts -->
+  <script src="firebase-config.js"></script>
+  <script src="qr.js"></script>
+  <script src="game.js"></script>
+  <script src="app.js"></script>
+
+</body>
+</html>
