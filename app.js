@@ -584,8 +584,8 @@ const App = {
       const modal = document.getElementById('name-modal');
       const input = document.getElementById('input-player-name');
       const btn = document.getElementById('btn-confirm-name');
+      const cancelBtn = document.getElementById('btn-cancel-name');
       if (!modal || !input || !btn) {
-        // Fallback to prompt if modal elements missing
         const name = prompt('Enter your display name:');
         resolve(name && name.trim() ? name.trim().substring(0, 20) : null);
         return;
@@ -594,11 +594,9 @@ const App = {
       input.value = '';
       btn.disabled = true;
 
-      // Enable button when input has text
       const onInput = () => { btn.disabled = !input.value.trim(); };
       input.addEventListener('input', onInput);
 
-      // Allow enter key
       const onKeyup = (e) => { if (e.key === 'Enter' && input.value.trim()) btn.click(); };
       input.addEventListener('keyup', onKeyup);
 
@@ -614,7 +612,7 @@ const App = {
         resolve(name || null);
       };
 
-      // Handle cancel (backdrop click or Esc)
+      cancelBtn.onclick = () => { cleanup(); resolve(null); };
       modal.addEventListener('cancel', () => { cleanup(); resolve(null); }, { once: true });
 
       modal.showModal();

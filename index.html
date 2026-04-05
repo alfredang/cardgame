@@ -303,9 +303,14 @@
       <div class="input-group">
         <input type="text" class="input" id="input-player-name" placeholder="Your name" maxlength="20" autocomplete="off">
       </div>
-      <button class="btn btn-primary btn-full mt-2" id="btn-confirm-name" disabled>
-        Continue
-      </button>
+      <div style="display:flex;gap:0.5rem;margin-top:1rem">
+        <button class="btn btn-secondary" id="btn-cancel-name" style="flex:1">
+          Cancel
+        </button>
+        <button class="btn btn-primary" id="btn-confirm-name" disabled style="flex:1">
+          Continue
+        </button>
+      </div>
     </div>
   </dialog>
 
