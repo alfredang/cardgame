@@ -716,6 +716,9 @@ document.addEventListener('DOMContentLoaded', () => {
     App.startGame();
   });
 
+  // --- Leave room ---
+  document.getElementById('btn-leave-room').addEventListener('click', () => App.goHome());
+
   // --- Modal close buttons ---
   document.getElementById('modal-close').addEventListener('click', () => {
     document.getElementById('card-modal').close();
