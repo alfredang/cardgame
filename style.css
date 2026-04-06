@@ -706,41 +706,66 @@ h4 { font-size: clamp(1rem, 2.5vw, 1.25rem); }
   font-family: monospace;
 }
 
-/* Host Menu */
+/* Host Menu — bottom sheet on mobile */
 .host-menu {
-  position: absolute;
-  top: var(--header-height);
-  right: 0.5rem;
-  z-index: 60;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
   background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-lg);
-  overflow: hidden;
-  min-width: 180px;
-  animation: fadeIn 0.2s ease;
+  border-top: 1px solid var(--border);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.5);
+  padding: 0.5rem 0 calc(0.5rem + var(--safe-bottom));
+  animation: slideUp 0.25s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.host-menu::before {
+  content: '';
+  display: block;
+  width: 36px;
+  height: 4px;
+  background: var(--text-muted);
+  border-radius: 2px;
+  margin: 0.25rem auto 0.75rem;
 }
 
 .host-menu-item {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  padding: 0.875rem 1rem;
+  padding: 1rem;
   background: none;
   border: none;
   border-bottom: 1px solid var(--border-light);
   color: var(--text-primary);
-  font-size: 0.9rem;
-  font-weight: 500;
-  text-align: left;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
   transition: background var(--transition);
+  min-height: 52px;
 }
 
 .host-menu-item:last-child { border-bottom: none; }
 .host-menu-item:hover { background: var(--bg-tertiary); }
-.host-menu-item:active { transform: scale(0.98); }
+.host-menu-item:active { background: var(--bg-tertiary); transform: scale(0.98); }
 .host-menu-danger { color: var(--danger); }
 .host-menu-danger:hover { background: var(--danger-bg); }
+
+.host-menu-backdrop {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 199;
+  background: rgba(0, 0, 0, 0.5);
+  animation: fadeIn 0.2s ease;
+}
 
 .game-time-display {
   display: flex;

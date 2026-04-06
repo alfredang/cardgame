@@ -812,14 +812,33 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- Help button ---
   document.getElementById('btn-help').addEventListener('click', () => App.showTutorial(true));
 
-  // --- Host menu ---
-  document.getElementById('btn-host-menu').addEventListener('click', () => {
+  // --- Host menu (bottom sheet) ---
+  const openHostMenu = () => {
     const menu = document.getElementById('host-menu');
-    menu.classList.toggle('hidden');
-  });
+    menu.classList.remove('hidden');
+    // Add backdrop
+    let backdrop = document.getElementById('host-menu-backdrop');
+    if (!backdrop) {
+      backdrop = document.createElement('div');
+      backdrop.id = 'host-menu-backdrop';
+      backdrop.className = 'host-menu-backdrop';
+      document.body.appendChild(backdrop);
+    } else {
+      backdrop.style.display = '';
+    }
+    backdrop.onclick = closeHostMenu;
+  };
+
+  const closeHostMenu = () => {
+    document.getElementById('host-menu').classList.add('hidden');
+    const backdrop = document.getElementById('host-menu-backdrop');
+    if (backdrop) backdrop.style.display = 'none';
+  };
+
+  document.getElementById('btn-host-menu').addEventListener('click', openHostMenu);
 
   document.getElementById('btn-end-game-early').addEventListener('click', async () => {
-    document.getElementById('host-menu').classList.add('hidden');
+    closeHostMenu();
     if (!App.isHost || !App.gameEngine) return;
     if (confirm('End the game now and show final scores?')) {
       await App.gameEngine.endGame();
@@ -827,7 +846,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('btn-restart-game').addEventListener('click', async () => {
-    document.getElementById('host-menu').classList.add('hidden');
+    closeHostMenu();
     if (!App.isHost) return;
     if (confirm('Restart the game? All progress will be lost.')) {
       await App.rematch();
@@ -835,18 +854,9 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('btn-leave-game').addEventListener('click', () => {
-    document.getElementById('host-menu').classList.add('hidden');
+    closeHostMenu();
     if (confirm('Leave this game and go home?')) {
       App.goHome();
-    }
-  });
-
-  // Close host menu when tapping elsewhere
-  document.addEventListener('click', (e) => {
-    const menu = document.getElementById('host-menu');
-    const btn = document.getElementById('btn-host-menu');
-    if (!menu.classList.contains('hidden') && !menu.contains(e.target) && e.target !== btn) {
-      menu.classList.add('hidden');
     }
   });
 
