@@ -1,0 +1,19 @@
+- generic [ref=e1]:
+  - button "Toggle theme" [ref=e2] [cursor=pointer]:
+    - generic [ref=e3]: ☾
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e6]: ⚖
+      - heading "Queue Number" [level=1] [ref=e7]
+      - paragraph [ref=e8]: The Great Allocation — a strategy card game of scarcity, queues, and tradeoffs
+    - generic [ref=e9]:
+      - button "Create Room" [active] [ref=e10] [cursor=pointer]
+      - generic [ref=e11]:
+        - textbox "ROOM CODE" [ref=e12]
+        - button "Join Room" [ref=e13] [cursor=pointer]
+    - generic [ref=e14]:
+      - link "How to Play" [ref=e15] [cursor=pointer]:
+        - /url: instructions.html
+      - generic [ref=e16]: "|"
+      - link "Local Test" [ref=e17] [cursor=pointer]:
+        - /url: "#"

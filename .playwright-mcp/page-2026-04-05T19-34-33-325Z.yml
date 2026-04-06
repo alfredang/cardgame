@@ -1,0 +1,30 @@
+- generic [active] [ref=e1]:
+  - button "Toggle theme" [ref=e2] [cursor=pointer]:
+    - generic [ref=e3]: ☾
+  - generic [ref=e25]:
+    - generic [ref=e26]:
+      - heading "Game Lobby" [level=2] [ref=e27]
+      - paragraph [ref=e28]: Share the code or scan QR to join
+      - generic [ref=e29]:
+        - generic [ref=e30]: HRW7
+        - button "📋" [ref=e31] [cursor=pointer]
+    - generic [ref=e32]:
+      - generic "https://alfredang.github.io/cardgame/?join=HRW7" [ref=e33]:
+        - img [ref=e34]
+      - paragraph [ref=e35]: Scan to join on your phone
+      - generic [ref=e36]:
+        - button "Copy Link" [ref=e37] [cursor=pointer]
+        - button "Share" [ref=e38] [cursor=pointer]
+    - generic [ref=e39]:
+      - generic [ref=e40]:
+        - generic [ref=e41]: Players
+        - generic [ref=e42]: 1 / 5
+      - generic [ref=e44]:
+        - generic [ref=e45]: T
+        - generic [ref=e46]:
+          - generic [ref=e47]: TestPlayer (you)
+          - generic [ref=e48]: Connected
+        - generic [ref=e49]: Host
+    - generic [ref=e51]:
+      - button "Start Game" [disabled] [ref=e52]
+      - paragraph [ref=e53]: Need at least 2 players to start
