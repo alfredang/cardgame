@@ -1330,10 +1330,7 @@ dialog {
   max-height: 85vh;
   width: 360px;
   margin: auto;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  z-index: 9998;
 }
 
 dialog::backdrop {
@@ -1346,8 +1343,8 @@ dialog[open] {
 }
 
 @keyframes modalIn {
-  from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
-  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 .modal-content {

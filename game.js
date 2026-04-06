@@ -517,8 +517,12 @@ class GameEngine {
 
     // Milestone choice phase
     if (data.phase === 'milestone_choice' && data.milestoneChoices) {
-      const myChoices = data.milestoneChoices[this.playerId];
-      if (myChoices && !this.milestoneChosen) {
+      let myChoices = data.milestoneChoices[this.playerId];
+      // Firebase may convert arrays to objects — normalize
+      if (myChoices && typeof myChoices === 'object' && !Array.isArray(myChoices) && myChoices !== 'done') {
+        myChoices = Object.values(myChoices);
+      }
+      if (myChoices && myChoices !== 'done' && Array.isArray(myChoices) && !this.milestoneChosen) {
         this.showMilestoneChoice(myChoices);
       }
     }
