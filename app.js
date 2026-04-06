@@ -415,6 +415,11 @@ const App = {
       if (this.gameEngine.phase === 'commit' && !this.gameEngine.hasSubmitted) {
         this.gameEngine.submitCommitment();
       } else if (this.gameEngine.phase === 'resolve' && this.isHost) {
+        // Clear auto-advance interval if host clicks manually
+        if (this.gameEngine._autoAdvanceInterval) {
+          clearInterval(this.gameEngine._autoAdvanceInterval);
+          this.gameEngine._autoAdvanceInterval = null;
+        }
         this.gameEngine.advanceRound();
       }
     });
@@ -689,8 +694,6 @@ const App = {
     await FirebaseHelper.removeData(`rooms/${this.roomCode}/hands`);
     await FirebaseHelper.removeData(`rooms/${this.roomCode}/submissions`);
     await FirebaseHelper.removeData(`rooms/${this.roomCode}/decks`);
-    await FirebaseHelper.removeData(`rooms/${this.roomCode}/milestoneChoices`);
-
     this.showLobby();
     Toast.show('Room reset! Start a new game when ready.', 'info');
   },

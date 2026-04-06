@@ -141,6 +141,11 @@
         <div class="opportunity-row" id="opportunity-row">
           <!-- Opportunity cards rendered dynamically -->
         </div>
+
+        <div class="inline-hand hidden" id="inline-hand-section">
+          <h3>Your Cards</h3>
+          <div class="card-carousel" id="inline-card-carousel"></div>
+        </div>
       </div>
 
       <!-- Hand Tab -->
@@ -163,12 +168,6 @@
           </div>
         </div>
 
-        <div class="milestones-section">
-          <h4>Your Milestones</h4>
-          <div class="milestone-list" id="player-milestones">
-            <!-- Milestones rendered dynamically -->
-          </div>
-        </div>
       </div>
 
       <!-- Score Tab -->
@@ -187,6 +186,13 @@
             <!-- Rows rendered dynamically -->
           </tbody>
         </table>
+
+        <div class="milestones-section">
+          <h4>Your Milestones</h4>
+          <div class="milestone-list" id="player-milestones">
+            <!-- Milestones rendered dynamically -->
+          </div>
+        </div>
       </div>
 
       <!-- Log Tab -->
@@ -282,22 +288,6 @@
         <!-- Results rendered dynamically -->
       </div>
       <button class="btn btn-primary btn-full mt-2" id="btn-continue-round">Continue</button>
-    </div>
-  </dialog>
-
-  <!-- ============================================================
-       DIALOG: Milestone Choice
-       ============================================================ -->
-  <dialog id="milestone-modal">
-    <div class="modal-content">
-      <h3 class="modal-card-title">Choose a Milestone</h3>
-      <p class="text-secondary mb-2" style="font-size:0.9rem">Pick one milestone to keep. This will guide your scoring strategy.</p>
-      <div class="milestone-choice" id="milestone-choice">
-        <!-- Milestone options rendered dynamically -->
-      </div>
-      <button class="btn btn-primary btn-full mt-2" id="btn-confirm-milestone" disabled>
-        Confirm Choice
-      </button>
     </div>
   </dialog>
 

@@ -404,10 +404,10 @@ class GameEngine {
         hands[pid] = { cards: dealCards(this.decks.queueDeck, 5) };
       }
 
-      // Deal milestone choices (2 per player)
-      const milestoneChoices = {};
+      // Auto-assign 1 random milestone per player
+      const autoMilestones = {};
       for (const pid of Object.keys(playerList)) {
-        milestoneChoices[pid] = dealCards(this.decks.milestoneDeck, 2);
+        autoMilestones[pid] = dealCards(this.decks.milestoneDeck, 1);
       }
 
       // Initial opportunity row
@@ -418,13 +418,12 @@ class GameEngine {
       await FirebaseHelper.setData(`${this.roomPath}/gameState`, {
         round: 1,
         totalRounds: this.totalRounds,
-        phase: 'milestone_choice',
+        phase: 'commit',
         oppRowSize: oppRowSize,
         opportunityRow: opportunityRow,
         disruption: disruption,
         scores: {},
         log: [],
-        milestoneChoices: milestoneChoices,
       });
 
       // Write hands
@@ -439,13 +438,13 @@ class GameEngine {
         disruptionDeck: this.decks.disruptionDeck,
       });
 
-      // Initialize player scores
+      // Initialize player scores with auto-assigned milestones
       const scores = {};
       for (const pid of Object.keys(playerList)) {
         scores[pid] = {
           time: 10,
           score: 0,
-          milestones: [],
+          milestones: autoMilestones[pid] || [],
           wonOpportunities: [],
           auctionSpent: 0,
           earlyWin: false,
@@ -493,18 +492,6 @@ class GameEngine {
     });
     this.listeners.push(subCountRef);
 
-    // Host listens for milestone choices being completed
-    if (this.isHost) {
-      const msRef = FirebaseHelper.onValue(`${this.roomPath}/milestoneChoices`, (data) => {
-        if (!data || this.phase !== 'milestone_choice') return;
-        const playerIds = Object.keys(this.players);
-        const allDone = playerIds.every(pid => data[pid] === 'done');
-        if (allDone) {
-          this.checkAllMilestonesChosen();
-        }
-      });
-      this.listeners.push(msRef);
-    }
   }
 
   /** Handle game state updates from Firebase */
@@ -533,21 +520,6 @@ class GameEngine {
       this.finalRoundWin = myScore.finalRoundWin || false;
     }
 
-    // Milestone choice phase
-    if (data.phase === 'milestone_choice' && data.milestoneChoices && !this.milestoneChosen) {
-      let myChoices = data.milestoneChoices[this.playerId];
-      // Firebase may convert arrays to objects — normalize
-      if (myChoices && typeof myChoices === 'object' && !Array.isArray(myChoices) && myChoices !== 'done') {
-        myChoices = Object.values(myChoices);
-      }
-      if (myChoices && myChoices !== 'done' && Array.isArray(myChoices)) {
-        this.showMilestoneChoice(myChoices);
-        // Auto-skip if player doesn't choose within 30 seconds
-        clearTimeout(this._milestoneTimeout);
-        this._milestoneTimeout = setTimeout(() => this.autoSkipMilestone(), 30000);
-      }
-    }
-
     // Render updates
     this.renderHeader();
     this.renderBoard();
@@ -568,6 +540,12 @@ class GameEngine {
   }
 
   onPhaseChange(phase, data) {
+    // Clear auto-advance interval on commit phase
+    if (this._autoAdvanceInterval) {
+      clearInterval(this._autoAdvanceInterval);
+      this._autoAdvanceInterval = null;
+    }
+
     // Reset selections on new commit phase
     if (phase === 'commit') {
       this.selectedCardIndex = null;
@@ -577,7 +555,15 @@ class GameEngine {
       this.renderHand();
       this.renderBoard();
       this.hideWaiting();
+      // Auto-switch to board tab for unified view
+      this.switchTab('tab-board');
       Toast.show(`Round ${this.round} — pick your move!`, 'info');
+
+      // On round 1, show auto-assigned milestone name
+      if (this.round === 1 && this.milestones && this.milestones.length > 0) {
+        const msName = this.milestones[0].name || 'Unknown';
+        setTimeout(() => Toast.show(`Your milestone: ${msName}`, 'info'), 500);
+      }
     }
 
     if (phase === 'resolve') {
@@ -589,6 +575,24 @@ class GameEngine {
       }
       if (results.length > 0) {
         this.showRoundResults(results);
+      }
+
+      // Auto-advance after 5 seconds if host
+      if (this.isHost) {
+        let countdown = 5;
+        const btn = document.getElementById('btn-action');
+        this._autoAdvanceInterval = setInterval(() => {
+          countdown--;
+          if (btn) btn.textContent = `Next round in ${countdown}s...`;
+          if (countdown <= 0) {
+            clearInterval(this._autoAdvanceInterval);
+            this._autoAdvanceInterval = null;
+            // Close results modal
+            const resultsModal = document.getElementById('results-modal');
+            if (resultsModal && resultsModal.open) resultsModal.close();
+            this.advanceRound();
+          }
+        }, 1000);
       }
     }
 
@@ -607,13 +611,9 @@ class GameEngine {
       this.selectedCardIndex = null;
     } else {
       this.selectedCardIndex = index;
-      // Auto-navigate to Opportunities tab after picking a card
-      if (this.selectedOpportunityIndex === null) {
-        setTimeout(() => this.switchTab('tab-board'), 300);
-        Toast.show('Now tap an Opportunity to target!', 'info');
-      }
     }
     this.renderHand();
+    this.renderBoard();
     this.updateActionBar();
     this.updateCommitReview();
   }
@@ -624,11 +624,6 @@ class GameEngine {
       this.selectedOpportunityIndex = null;
     } else {
       this.selectedOpportunityIndex = index;
-      // If no card selected yet, nudge to My Cards tab
-      if (this.selectedCardIndex === null) {
-        setTimeout(() => this.switchTab('tab-hand'), 300);
-        Toast.show('Pick a card from My Cards first!', 'info');
-      }
     }
     this.renderBoard();
     this.updateActionBar();
@@ -679,52 +674,6 @@ class GameEngine {
     this.showWaiting();
   }
 
-  async chooseMilestone(milestoneIndex, choices) {
-    const chosen = choices[milestoneIndex];
-    this.milestoneChosen = true;
-
-    // Update player's milestones in scores
-    await FirebaseHelper.updateData(`${this.roomPath}/gameState/scores/${this.playerId}`, {
-      milestones: [chosen],
-    });
-
-    // Mark choice as done at the root milestoneChoices path
-    await FirebaseHelper.setData(`${this.roomPath}/milestoneChoices/${this.playerId}`, 'done');
-
-    document.getElementById('milestone-modal').close();
-    Toast.show(`Milestone chosen: ${chosen.name}`, 'success');
-
-    // All players notify host to check (host may also be this player)
-    if (this.isHost) {
-      setTimeout(() => this.checkAllMilestonesChosen(), 500);
-    }
-  }
-
-  /** Auto-skip milestone choice if modal never appeared */
-  async autoSkipMilestone() {
-    if (this.milestoneChosen) return;
-    this.milestoneChosen = true;
-
-    // Pick the first milestone automatically
-    const data = await FirebaseHelper.getData(`${this.roomPath}/gameState/milestoneChoices`);
-    let myChoices = data && data[this.playerId];
-    if (myChoices && typeof myChoices === 'object' && !Array.isArray(myChoices)) {
-      myChoices = Object.values(myChoices);
-    }
-    const chosen = Array.isArray(myChoices) && myChoices.length > 0 ? myChoices[0] : { id: 'ms_09', name: 'Diversifier', category: 'special', condition: 'Collect from 4+ different categories', points: 5, setBonus: null };
-
-    await FirebaseHelper.updateData(`${this.roomPath}/gameState/scores/${this.playerId}`, {
-      milestones: [chosen],
-    });
-    await FirebaseHelper.setData(`${this.roomPath}/milestoneChoices/${this.playerId}`, 'done');
-
-    Toast.show(`Auto-assigned milestone: ${chosen.name}`, 'info');
-    try { document.getElementById('milestone-modal').close(); } catch(e) {}
-
-    if (this.isHost) {
-      setTimeout(() => this.checkAllMilestonesChosen(), 500);
-    }
-  }
 
   // ============================================================
   // HOST RESOLUTION
@@ -746,22 +695,6 @@ class GameEngine {
         Toast.show('Error resolving round. Retrying...', 'error');
         setTimeout(() => { this._resolving = false; this.checkAllSubmitted(); }, 2000);
       }
-    }
-  }
-
-  async checkAllMilestonesChosen() {
-    if (!this.isHost) return;
-
-    const data = await FirebaseHelper.getData(`${this.roomPath}/milestoneChoices`);
-    if (!data) return;
-
-    const playerIds = Object.keys(this.players);
-    const allChosen = playerIds.every(pid => data[pid] === 'done');
-
-    if (allChosen) {
-      // Transition directly to commit phase so players can act
-      await FirebaseHelper.updateData(`${this.roomPath}/gameState`, { phase: 'commit' });
-      await this.addLog('Game started! Round 1 begins.');
     }
   }
 
@@ -1061,16 +994,25 @@ class GameEngine {
 
     if (roundEl) roundEl.textContent = `Round ${this.round}/${this.totalRounds}`;
     if (phaseEl) {
-      const displayPhase = this.phase === 'milestone_choice' ? 'SETUP' : this.phase.toUpperCase();
+      const displayPhase = this.phase.toUpperCase();
       phaseEl.textContent = displayPhase;
       phaseEl.className = 'game-phase-badge';
-      if (this.phase === 'reveal' || this.phase === 'milestone_choice') phaseEl.classList.add('phase-reveal');
+      if (this.phase === 'reveal') phaseEl.classList.add('phase-reveal');
       else if (this.phase === 'commit') phaseEl.classList.add('phase-commit');
       else if (this.phase === 'resolve') phaseEl.classList.add('phase-resolve');
       else if (this.phase === 'refresh') phaseEl.classList.add('phase-refresh');
     }
     if (timeEl) timeEl.textContent = this.time;
     if (codeEl) codeEl.textContent = this.roomCode;
+  }
+
+  buildRewardSummary(opp) {
+    const parts = [];
+    if (opp.reward.score) parts.push(`+${opp.reward.score} Score`);
+    if (opp.reward.time) parts.push(`+${opp.reward.time} Time`);
+    if (opp.reward.milestone) parts.push('Milestone progress');
+    if (parts.length === 0) parts.push('No direct reward');
+    return parts.join(', ');
   }
 
   renderBoard() {
@@ -1088,14 +1030,7 @@ class GameEngine {
           <span class="opp-title">${opp.name}</span>
           <span class="opp-type-badge type-${opp.resolution}">${opp.resolution}</span>
         </div>
-        <p class="opp-description">${opp.description}</p>
-        <div class="opp-details">
-          <span class="opp-detail">Slots: <span class="value">${opp.slots}</span></span>
-          ${opp.reward.score ? `<span class="opp-detail">Score: <span class="value">+${opp.reward.score}</span></span>` : ''}
-          ${opp.reward.time ? `<span class="opp-detail">Time: <span class="value">+${opp.reward.time}</span></span>` : ''}
-          ${opp.reward.milestone ? `<span class="opp-detail badge-success" style="padding:0.15rem 0.5rem;border-radius:100px">Milestone</span>` : ''}
-          ${opp.consolation && opp.consolation.time ? `<span class="opp-detail">Consolation: <span class="value">+${opp.consolation.time}T</span></span>` : ''}
-        </div>
+        <div class="opp-reward-summary">${this.buildRewardSummary(opp)}</div>
       `;
 
       card.addEventListener('click', () => {
@@ -1107,6 +1042,44 @@ class GameEngine {
       });
 
       row.appendChild(card);
+    });
+
+    // Render inline hand when in commit phase
+    if (this.phase === 'commit') {
+      this.renderInlineHand();
+    }
+    const inlineSection = document.getElementById('inline-hand-section');
+    if (inlineSection) {
+      inlineSection.classList.toggle('hidden', this.phase !== 'commit');
+    }
+  }
+
+  renderInlineHand() {
+    const carousel = document.getElementById('inline-card-carousel');
+    if (!carousel) return;
+
+    carousel.innerHTML = '';
+    this.hand.forEach((card, index) => {
+      const cardEl = document.createElement('div');
+      cardEl.className = 'game-card queue-card';
+      if (this.selectedCardIndex === index) cardEl.classList.add('selected');
+
+      cardEl.innerHTML = `
+        <span class="card-type-label">Queue</span>
+        <div class="card-number">${card.value}</div>
+        <div class="card-name">${card.name}</div>
+        <div class="card-effect">${card.effect}</div>
+      `;
+
+      cardEl.addEventListener('click', () => {
+        if (this.phase === 'commit') {
+          this.selectCard(index);
+        } else {
+          this.openCardModal(card, 'queue');
+        }
+      });
+
+      carousel.appendChild(cardEl);
     });
   }
 
@@ -1228,14 +1201,14 @@ class GameEngine {
       btn.disabled = !canSubmit;
 
       if (canSubmit) {
-        btn.textContent = 'Ready! Tap Submit to commit your move';
+        btn.textContent = 'Submit!';
         btn.className = 'btn btn-primary btn-full';
       } else if (this.selectedCardIndex !== null) {
-        btn.textContent = 'Step 2: Tap an Opportunity to target';
+        btn.textContent = 'Now pick a target above';
         btn.className = 'btn btn-secondary btn-full';
         btn.disabled = true;
       } else {
-        btn.textContent = 'Step 1: Go to My Cards and pick one';
+        btn.textContent = 'Pick a card below';
         btn.className = 'btn btn-secondary btn-full';
         btn.disabled = true;
       }
@@ -1261,10 +1234,6 @@ class GameEngine {
         btn.className = 'btn btn-secondary btn-full';
         btn.disabled = true;
       }
-    } else if (this.phase === 'milestone_choice') {
-      btn.textContent = 'Choose your milestone above';
-      btn.className = 'btn btn-secondary btn-full';
-      btn.disabled = true;
     } else {
       btn.textContent = this.hasSubmitted ? 'Waiting for other players...' : 'Waiting...';
       btn.className = 'btn btn-secondary btn-full';
@@ -1334,46 +1303,6 @@ class GameEngine {
     } else {
       review.classList.add('hidden');
     }
-  }
-
-  showMilestoneChoice(choices) {
-    const modal = document.getElementById('milestone-modal');
-    const container = document.getElementById('milestone-choice');
-    const confirmBtn = document.getElementById('btn-confirm-milestone');
-    if (!modal || !container) return;
-
-    let selectedIndex = null;
-    container.innerHTML = '';
-
-    choices.forEach((ms, index) => {
-      const card = document.createElement('div');
-      card.className = 'milestone-choice-card';
-      card.innerHTML = `
-        <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem">
-          <span style="font-size:1.5rem;font-weight:800;color:var(--card-milestone)">${ms.points}</span>
-          <span style="font-weight:700">${ms.name}</span>
-        </div>
-        <p style="font-size:0.85rem;color:var(--text-secondary)">${ms.condition}</p>
-        ${ms.setBonus ? `<span class="badge badge-warning" style="margin-top:0.5rem">Set bonus: ${ms.setBonus}</span>` : ''}
-      `;
-
-      card.addEventListener('click', () => {
-        container.querySelectorAll('.milestone-choice-card').forEach(c => c.classList.remove('selected'));
-        card.classList.add('selected');
-        selectedIndex = index;
-        confirmBtn.disabled = false;
-      });
-
-      container.appendChild(card);
-    });
-
-    confirmBtn.onclick = () => {
-      if (selectedIndex !== null) {
-        this.chooseMilestone(selectedIndex, choices);
-      }
-    };
-
-    modal.showModal();
   }
 
   showRoundResults(results) {

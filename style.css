@@ -850,6 +850,15 @@ h4 { font-size: clamp(1rem, 2.5vw, 1.25rem); }
   margin-top: 0.25rem;
 }
 
+.opp-reward-summary {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}
+
+.inline-hand { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+.inline-hand h3 { font-size: 1rem; margin-bottom: 0.75rem; }
+
 .opp-assigned-count {
   position: absolute;
   top: 0.5rem;
