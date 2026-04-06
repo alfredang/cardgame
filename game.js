@@ -513,7 +513,12 @@ class GameEngine {
     this.phase = data.phase;
     this.round = data.round || 1;
     this.totalRounds = data.totalRounds || 8;
-    this.opportunityRow = data.opportunityRow || [];
+    // Firebase may convert arrays to objects — normalize
+    let oppRow = data.opportunityRow || [];
+    if (oppRow && typeof oppRow === 'object' && !Array.isArray(oppRow)) {
+      oppRow = Object.values(oppRow);
+    }
+    this.opportunityRow = oppRow;
     this.disruption = data.disruption || null;
     this.scores = data.scores || {};
 
@@ -572,10 +577,19 @@ class GameEngine {
       this.renderHand();
       this.renderBoard();
       this.hideWaiting();
+      Toast.show(`Round ${this.round} — pick your move!`, 'info');
     }
 
-    if (phase === 'resolve' && data.roundResults) {
-      this.showRoundResults(data.roundResults);
+    if (phase === 'resolve') {
+      this.hideWaiting();
+      // Normalize roundResults from Firebase
+      let results = data.roundResults || [];
+      if (results && typeof results === 'object' && !Array.isArray(results)) {
+        results = Object.values(results);
+      }
+      if (results.length > 0) {
+        this.showRoundResults(results);
+      }
     }
 
     if (phase === 'reveal') {
@@ -593,6 +607,11 @@ class GameEngine {
       this.selectedCardIndex = null;
     } else {
       this.selectedCardIndex = index;
+      // Auto-navigate to Opportunities tab after picking a card
+      if (this.selectedOpportunityIndex === null) {
+        setTimeout(() => this.switchTab('tab-board'), 300);
+        Toast.show('Now tap an Opportunity to target!', 'info');
+      }
     }
     this.renderHand();
     this.updateActionBar();
@@ -605,10 +624,25 @@ class GameEngine {
       this.selectedOpportunityIndex = null;
     } else {
       this.selectedOpportunityIndex = index;
+      // If no card selected yet, nudge to My Cards tab
+      if (this.selectedCardIndex === null) {
+        setTimeout(() => this.switchTab('tab-hand'), 300);
+        Toast.show('Pick a card from My Cards first!', 'info');
+      }
     }
     this.renderBoard();
     this.updateActionBar();
     this.updateCommitReview();
+  }
+
+  /** Switch to a tab programmatically */
+  switchTab(tabId) {
+    document.querySelectorAll('.nav-tab').forEach(t => {
+      t.classList.toggle('active', t.getAttribute('data-tab') === tabId);
+    });
+    document.querySelectorAll('.tab-content').forEach(tc => {
+      tc.classList.toggle('active', tc.id === tabId);
+    });
   }
 
   setTimeBid(value) {
@@ -698,12 +732,20 @@ class GameEngine {
 
   async checkAllSubmitted() {
     if (!this.isHost || this.phase !== 'commit') return;
+    if (this._resolving) return; // prevent double resolution
 
     const playerIds = Object.keys(this.players);
     const submittedCount = Object.values(this.submissions).filter(s => s && s.submitted).length;
 
     if (submittedCount >= playerIds.length && playerIds.length > 0) {
-      await this.resolveRound();
+      this._resolving = true;
+      try {
+        await this.resolveRound();
+      } catch (e) {
+        console.error('Resolution error:', e);
+        Toast.show('Error resolving round. Retrying...', 'error');
+        setTimeout(() => { this._resolving = false; this.checkAllSubmitted(); }, 2000);
+      }
     }
   }
 
@@ -936,6 +978,7 @@ class GameEngine {
 
     // Clear submissions
     await FirebaseHelper.removeData(`${this.roomPath}/submissions`);
+    this._resolving = false;
   }
 
   /** Advance to next round (called after results are shown) */
@@ -1188,11 +1231,11 @@ class GameEngine {
         btn.textContent = 'Ready! Tap Submit to commit your move';
         btn.className = 'btn btn-primary btn-full';
       } else if (this.selectedCardIndex !== null) {
-        btn.textContent = 'Step 2: Go to BOARD tab and tap an Opportunity';
+        btn.textContent = 'Step 2: Tap an Opportunity to target';
         btn.className = 'btn btn-secondary btn-full';
         btn.disabled = true;
       } else {
-        btn.textContent = 'Step 1: Go to HAND tab and tap a card';
+        btn.textContent = 'Step 1: Go to My Cards and pick one';
         btn.className = 'btn btn-secondary btn-full';
         btn.disabled = true;
       }
