@@ -1,3 +1,0 @@
-[     691ms] [WARNING] <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes"> @ https://alfredang.github.io/cardgame/:0
-[     941ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://alfredang.github.io/favicon.ico:0
-[   16224ms] [WARNING] [2026-04-05T19:26:24.320Z]  @firebase/database: FIREBASE WARNING: Database lives in a different region. Please change your database URL to https://cardgame-c4f55-default-rtdb.asia-southeast1.firebasedatabase.app (https://cardgame-c4f55-default-rtdb.firebaseio.com/)  @ https://www.gstatic.com/firebasejs/10.14.0/firebase-database-compat.js:0
