@@ -1143,14 +1143,14 @@ class GameEngine {
       btn.disabled = !canSubmit;
 
       if (canSubmit) {
-        btn.textContent = 'Submit Commitment';
+        btn.textContent = 'Ready! Tap Submit to commit your move';
         btn.className = 'btn btn-primary btn-full';
       } else if (this.selectedCardIndex !== null) {
-        btn.textContent = 'Now select an Opportunity';
+        btn.textContent = 'Step 2: Go to BOARD tab and tap an Opportunity';
         btn.className = 'btn btn-secondary btn-full';
         btn.disabled = true;
       } else {
-        btn.textContent = 'Select a card to play';
+        btn.textContent = 'Step 1: Go to HAND tab and tap a card';
         btn.className = 'btn btn-secondary btn-full';
         btn.disabled = true;
       }
@@ -1166,16 +1166,22 @@ class GameEngine {
       } else {
         this.showTimeBidControl(false);
       }
-    } else if (this.phase === 'resolve' && this.isHost) {
-      btn.textContent = 'Next Round';
-      btn.className = 'btn btn-primary btn-full';
-      btn.disabled = false;
+    } else if (this.phase === 'resolve') {
+      if (this.isHost) {
+        btn.textContent = 'Next Round';
+        btn.className = 'btn btn-primary btn-full';
+        btn.disabled = false;
+      } else {
+        btn.textContent = 'Round results are in! Check who won';
+        btn.className = 'btn btn-secondary btn-full';
+        btn.disabled = true;
+      }
     } else if (this.phase === 'milestone_choice') {
       btn.textContent = 'Choose your milestone above';
       btn.className = 'btn btn-secondary btn-full';
       btn.disabled = true;
     } else {
-      btn.textContent = this.hasSubmitted ? 'Waiting for others...' : 'Waiting...';
+      btn.textContent = this.hasSubmitted ? 'Waiting for other players...' : 'Waiting...';
       btn.className = 'btn btn-secondary btn-full';
       btn.disabled = true;
     }

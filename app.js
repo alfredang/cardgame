@@ -379,6 +379,9 @@ const App = {
 
     // Setup action button
     this.initActionButton();
+
+    // Show tutorial on first play
+    setTimeout(() => this.showTutorial(), 500);
   },
 
   // ============================================================
@@ -576,6 +579,51 @@ const App = {
   },
 
   // ============================================================
+  // TUTORIAL
+  // ============================================================
+
+  showTutorial(force = false) {
+    if (!force && localStorage.getItem('qn-tutorial-seen')) return;
+
+    const modal = document.getElementById('tutorial-modal');
+    if (!modal) return;
+
+    this.tutorialSlide = 0;
+    this.updateTutorialSlide();
+    modal.showModal();
+  },
+
+  updateTutorialSlide() {
+    const slides = document.querySelectorAll('#tutorial-slides .tutorial-slide');
+    const dots = document.querySelectorAll('#tutorial-dots .tutorial-dot');
+    const prevBtn = document.getElementById('tutorial-prev');
+    const nextBtn = document.getElementById('tutorial-next');
+    const total = slides.length;
+
+    slides.forEach((s, i) => s.classList.toggle('active', i === this.tutorialSlide));
+    dots.forEach((d, i) => d.classList.toggle('active', i === this.tutorialSlide));
+
+    if (prevBtn) prevBtn.disabled = this.tutorialSlide === 0;
+    if (nextBtn) {
+      if (this.tutorialSlide === total - 1) {
+        nextBtn.textContent = 'Got it!';
+        nextBtn.className = 'btn btn-primary';
+      } else {
+        nextBtn.textContent = 'Next';
+        nextBtn.className = 'btn btn-primary';
+      }
+    }
+  },
+
+  closeTutorial() {
+    const modal = document.getElementById('tutorial-modal');
+    if (modal) modal.close();
+    localStorage.setItem('qn-tutorial-seen', '1');
+  },
+
+  tutorialSlide: 0,
+
+  // ============================================================
   // HELPERS
   // ============================================================
 
@@ -731,6 +779,29 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-continue-round').addEventListener('click', () => {
     document.getElementById('results-modal').close();
   });
+
+  // --- Tutorial modal ---
+  document.getElementById('tutorial-modal-close').addEventListener('click', () => App.closeTutorial());
+
+  document.getElementById('tutorial-next').addEventListener('click', () => {
+    const totalSlides = document.querySelectorAll('#tutorial-slides .tutorial-slide').length;
+    if (App.tutorialSlide >= totalSlides - 1) {
+      App.closeTutorial();
+    } else {
+      App.tutorialSlide++;
+      App.updateTutorialSlide();
+    }
+  });
+
+  document.getElementById('tutorial-prev').addEventListener('click', () => {
+    if (App.tutorialSlide > 0) {
+      App.tutorialSlide--;
+      App.updateTutorialSlide();
+    }
+  });
+
+  // --- Help button ---
+  document.getElementById('btn-help').addEventListener('click', () => App.showTutorial(true));
 
   // Close modals on backdrop click
   document.querySelectorAll('dialog').forEach(dialog => {

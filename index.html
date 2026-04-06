@@ -120,6 +120,7 @@
           <span id="game-time-tokens">10</span>
         </span>
         <span class="game-room-code" id="game-room-code"></span>
+        <button class="btn-help" id="btn-help" title="How to play">?</button>
       </div>
     </header>
 
@@ -317,6 +318,47 @@
         <button class="btn btn-primary" id="btn-confirm-name" disabled style="flex:1">
           Continue
         </button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ============================================================
+       DIALOG: Tutorial
+       ============================================================ -->
+  <dialog id="tutorial-modal">
+    <div class="modal-content">
+      <button class="modal-close" id="tutorial-modal-close">&times;</button>
+      <div class="tutorial-slides" id="tutorial-slides">
+        <div class="tutorial-slide active" data-slide="0">
+          <div class="tutorial-slide-icon">&#127922;</div>
+          <h4>Welcome! Here's how to play</h4>
+          <p>Compete with other players for scarce opportunities by playing queue cards. Use strategy to win the resources you need and score the most points!</p>
+        </div>
+        <div class="tutorial-slide" data-slide="1">
+          <div class="tutorial-slide-icon">&#9995;</div>
+          <h4>Your Hand</h4>
+          <p>You have 5 queue cards numbered 1&ndash;7. Low numbers give you Priority (first in line), while high numbers give more weight in Ballots (lucky draws).</p>
+        </div>
+        <div class="tutorial-slide" data-slide="2">
+          <div class="tutorial-slide-icon">&#9881;</div>
+          <h4>Each Round</h4>
+          <p>Look at the opportunities on the <strong>Board</strong> tab, then go to <strong>Hand</strong> tab and tap a card, go back to <strong>Board</strong> and tap an opportunity, then hit <strong>Submit</strong>.</p>
+        </div>
+        <div class="tutorial-slide" data-slide="3">
+          <div class="tutorial-slide-icon">&#9734;</div>
+          <h4>Scoring</h4>
+          <p>Win opportunities to earn points. Match your milestone objective for bonus points. Collect sets of the same category for even more. Most points at the end wins!</p>
+        </div>
+      </div>
+      <div class="tutorial-dots" id="tutorial-dots">
+        <div class="tutorial-dot active" data-dot="0"></div>
+        <div class="tutorial-dot" data-dot="1"></div>
+        <div class="tutorial-dot" data-dot="2"></div>
+        <div class="tutorial-dot" data-dot="3"></div>
+      </div>
+      <div class="tutorial-nav">
+        <button class="btn btn-secondary" id="tutorial-prev" disabled>Previous</button>
+        <button class="btn btn-primary" id="tutorial-next">Next</button>
       </div>
     </div>
   </dialog>
