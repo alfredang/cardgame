@@ -492,6 +492,19 @@ class GameEngine {
       this.updateWaitingDisplay(count, total);
     });
     this.listeners.push(subCountRef);
+
+    // Host listens for milestone choices being completed
+    if (this.isHost) {
+      const msRef = FirebaseHelper.onValue(`${this.roomPath}/milestoneChoices`, (data) => {
+        if (!data || this.phase !== 'milestone_choice') return;
+        const playerIds = Object.keys(this.players);
+        const allDone = playerIds.every(pid => data[pid] === 'done');
+        if (allDone) {
+          this.checkAllMilestonesChosen();
+        }
+      });
+      this.listeners.push(msRef);
+    }
   }
 
   /** Handle game state updates from Firebase */
@@ -516,14 +529,17 @@ class GameEngine {
     }
 
     // Milestone choice phase
-    if (data.phase === 'milestone_choice' && data.milestoneChoices) {
+    if (data.phase === 'milestone_choice' && data.milestoneChoices && !this.milestoneChosen) {
       let myChoices = data.milestoneChoices[this.playerId];
       // Firebase may convert arrays to objects — normalize
       if (myChoices && typeof myChoices === 'object' && !Array.isArray(myChoices) && myChoices !== 'done') {
         myChoices = Object.values(myChoices);
       }
-      if (myChoices && myChoices !== 'done' && Array.isArray(myChoices) && !this.milestoneChosen) {
+      if (myChoices && myChoices !== 'done' && Array.isArray(myChoices)) {
         this.showMilestoneChoice(myChoices);
+        // Auto-skip if player doesn't choose within 30 seconds
+        clearTimeout(this._milestoneTimeout);
+        this._milestoneTimeout = setTimeout(() => this.autoSkipMilestone(), 30000);
       }
     }
 
@@ -638,15 +654,41 @@ class GameEngine {
       milestones: [chosen],
     });
 
-    // Mark choice as done
+    // Mark choice as done at the root milestoneChoices path
     await FirebaseHelper.setData(`${this.roomPath}/milestoneChoices/${this.playerId}`, 'done');
 
     document.getElementById('milestone-modal').close();
     Toast.show(`Milestone chosen: ${chosen.name}`, 'success');
 
-    // Host checks if all milestones are chosen
+    // All players notify host to check (host may also be this player)
     if (this.isHost) {
-      setTimeout(() => this.checkAllMilestonesChosen(), 1000);
+      setTimeout(() => this.checkAllMilestonesChosen(), 500);
+    }
+  }
+
+  /** Auto-skip milestone choice if modal never appeared */
+  async autoSkipMilestone() {
+    if (this.milestoneChosen) return;
+    this.milestoneChosen = true;
+
+    // Pick the first milestone automatically
+    const data = await FirebaseHelper.getData(`${this.roomPath}/gameState/milestoneChoices`);
+    let myChoices = data && data[this.playerId];
+    if (myChoices && typeof myChoices === 'object' && !Array.isArray(myChoices)) {
+      myChoices = Object.values(myChoices);
+    }
+    const chosen = Array.isArray(myChoices) && myChoices.length > 0 ? myChoices[0] : { id: 'ms_09', name: 'Diversifier', category: 'special', condition: 'Collect from 4+ different categories', points: 5, setBonus: null };
+
+    await FirebaseHelper.updateData(`${this.roomPath}/gameState/scores/${this.playerId}`, {
+      milestones: [chosen],
+    });
+    await FirebaseHelper.setData(`${this.roomPath}/milestoneChoices/${this.playerId}`, 'done');
+
+    Toast.show(`Auto-assigned milestone: ${chosen.name}`, 'info');
+    try { document.getElementById('milestone-modal').close(); } catch(e) {}
+
+    if (this.isHost) {
+      setTimeout(() => this.checkAllMilestonesChosen(), 500);
     }
   }
 
@@ -675,8 +717,8 @@ class GameEngine {
     const allChosen = playerIds.every(pid => data[pid] === 'done');
 
     if (allChosen) {
-      // Transition to first reveal phase
-      await FirebaseHelper.updateData(`${this.roomPath}/gameState`, { phase: 'reveal' });
+      // Transition directly to commit phase so players can act
+      await FirebaseHelper.updateData(`${this.roomPath}/gameState`, { phase: 'commit' });
       await this.addLog('Game started! Round 1 begins.');
     }
   }
