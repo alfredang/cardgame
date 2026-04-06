@@ -121,8 +121,16 @@
         </span>
         <span class="game-room-code" id="game-room-code"></span>
         <button class="btn-help" id="btn-help" title="How to play">?</button>
+        <button class="btn-help" id="btn-host-menu" title="Game menu" style="display:none">&#9776;</button>
       </div>
     </header>
+
+    <!-- Host Menu Dropdown -->
+    <div class="host-menu hidden" id="host-menu">
+      <button class="host-menu-item" id="btn-end-game-early">End Game Now</button>
+      <button class="host-menu-item" id="btn-restart-game">Restart Game</button>
+      <button class="host-menu-item host-menu-danger" id="btn-leave-game">Leave &amp; Go Home</button>
+    </div>
 
     <!-- Main Content (tabbed) -->
     <main class="game-main">

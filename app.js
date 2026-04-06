@@ -380,6 +380,12 @@ const App = {
     // Setup action button
     this.initActionButton();
 
+    // Show host menu button for host
+    const hostMenuBtn = document.getElementById('btn-host-menu');
+    if (this.isHost && hostMenuBtn) {
+      hostMenuBtn.style.display = '';
+    }
+
     // Show tutorial on first play
     setTimeout(() => this.showTutorial(), 500);
   },
@@ -805,6 +811,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- Help button ---
   document.getElementById('btn-help').addEventListener('click', () => App.showTutorial(true));
+
+  // --- Host menu ---
+  document.getElementById('btn-host-menu').addEventListener('click', () => {
+    const menu = document.getElementById('host-menu');
+    menu.classList.toggle('hidden');
+  });
+
+  document.getElementById('btn-end-game-early').addEventListener('click', async () => {
+    document.getElementById('host-menu').classList.add('hidden');
+    if (!App.isHost || !App.gameEngine) return;
+    if (confirm('End the game now and show final scores?')) {
+      await App.gameEngine.endGame();
+    }
+  });
+
+  document.getElementById('btn-restart-game').addEventListener('click', async () => {
+    document.getElementById('host-menu').classList.add('hidden');
+    if (!App.isHost) return;
+    if (confirm('Restart the game? All progress will be lost.')) {
+      await App.rematch();
+    }
+  });
+
+  document.getElementById('btn-leave-game').addEventListener('click', () => {
+    document.getElementById('host-menu').classList.add('hidden');
+    if (confirm('Leave this game and go home?')) {
+      App.goHome();
+    }
+  });
+
+  // Close host menu when tapping elsewhere
+  document.addEventListener('click', (e) => {
+    const menu = document.getElementById('host-menu');
+    const btn = document.getElementById('btn-host-menu');
+    if (!menu.classList.contains('hidden') && !menu.contains(e.target) && e.target !== btn) {
+      menu.classList.add('hidden');
+    }
+  });
 
   // Close modals on backdrop click
   document.querySelectorAll('dialog').forEach(dialog => {
