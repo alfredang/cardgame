@@ -577,22 +577,38 @@ class GameEngine {
         this.showRoundResults(results);
       }
 
-      // Auto-advance after 5 seconds if host
+      // Auto-advance after 5 seconds if host (not on last round)
       if (this.isHost) {
-        let countdown = 5;
-        const btn = document.getElementById('btn-action');
-        this._autoAdvanceInterval = setInterval(() => {
-          countdown--;
-          if (btn) btn.textContent = `Next round in ${countdown}s...`;
-          if (countdown <= 0) {
-            clearInterval(this._autoAdvanceInterval);
-            this._autoAdvanceInterval = null;
-            // Close results modal
+        if (this._autoAdvanceInterval) clearInterval(this._autoAdvanceInterval);
+
+        if (this.round >= this.totalRounds) {
+          // Last round — end game after showing results
+          const btn = document.getElementById('btn-action');
+          if (btn) {
+            btn.textContent = 'Final Scores';
+            btn.disabled = false;
+            btn.className = 'btn btn-primary btn-full';
+          }
+          this._autoAdvanceInterval = setTimeout(() => {
             const resultsModal = document.getElementById('results-modal');
             if (resultsModal && resultsModal.open) resultsModal.close();
-            this.advanceRound();
-          }
-        }, 1000);
+            this.advanceRound(); // will trigger endGame()
+          }, 6000);
+        } else {
+          let countdown = 5;
+          const btn = document.getElementById('btn-action');
+          this._autoAdvanceInterval = setInterval(() => {
+            countdown--;
+            if (btn) btn.textContent = `Next round in ${countdown}s...`;
+            if (countdown <= 0) {
+              clearInterval(this._autoAdvanceInterval);
+              this._autoAdvanceInterval = null;
+              const resultsModal = document.getElementById('results-modal');
+              if (resultsModal && resultsModal.open) resultsModal.close();
+              this.advanceRound();
+            }
+          }, 1000);
+        }
       }
     }
 
@@ -917,6 +933,14 @@ class GameEngine {
   /** Advance to next round (called after results are shown) */
   async advanceRound() {
     if (!this.isHost) return;
+    if (this._advancing) return; // prevent double advance
+    this._advancing = true;
+
+    // Clear any auto-advance timer
+    if (this._autoAdvanceInterval) {
+      clearInterval(this._autoAdvanceInterval);
+      this._autoAdvanceInterval = null;
+    }
 
     if (this.round >= this.totalRounds) {
       await this.endGame();
@@ -943,6 +967,7 @@ class GameEngine {
       disruption: newDisruption,
       roundResults: null,
     });
+    this._advancing = false;
   }
 
   async endGame() {
